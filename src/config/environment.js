@@ -1,4 +1,12 @@
-const { DEV_ENVIRONMENT, PORT, JWT_SECRET } = process.env;
+const {
+  DEV_ENVIRONMENT,
+  PORT,
+  JWT_SECRET,
+  DISCORD_CLIENT_ID,
+  DISCORD_CILENT_SECRET,
+  DISCORD_CLIENT_PUBLIC_KEY,
+  DISCORD_BOT_TOKEN,
+} = process.env;
 let root = "https://jankpoll.ngrok.io";
 
 const environment = {
@@ -10,6 +18,11 @@ const environment = {
   // JWT
   JWTsecret: JWT_SECRET,
   // google
+  // discord
+  DISCORD_CLIENT_ID,
+  DISCORD_CILENT_SECRET,
+  DISCORD_CLIENT_PUBLIC_KEY,
+  DISCORD_BOT_TOKEN,
 };
 
 module.exports = environment;
