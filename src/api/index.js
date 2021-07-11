@@ -4,7 +4,8 @@ require("../utils").endpointTestRoute(router);
 /* ++++++++++++++++++++++++
 Other Routes
 ++++++++++++++++++++++++ */
-// router.use("/auth/", require("./auth"));
+router.use("/auth/", require("./auth"));
+router.use("/interactions/", require("./interactions"));
 
 // cookie test
 router.get("/setcookie", (req, res) => {
