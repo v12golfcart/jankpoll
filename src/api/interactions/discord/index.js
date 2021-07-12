@@ -10,12 +10,29 @@ router.use(verificationCheck);
 
 router.post("/", (req, res) => {
   const body = req.body;
-  const command = body.data.name;
+  let command;
+  if (
+    body.data.component_type === 2 &&
+    body.data.custom_id &&
+    body.data.custom_id.match("poll")
+  )
+    command = "poll-action";
+  else
+    command =
+      body.data.name === "create"
+        ? "create-" + body.data.options[0].name
+        : body.data.name;
 
   // handling command
   switch (command) {
     case "help":
       require("./commandHelp")(req, res);
+      break;
+    case "create-poll":
+      require("./commandCreatePoll")(req, res);
+      break;
+    case "poll-action":
+      require("./commandPollAction")(req, res);
       break;
     default:
       res.send("Unknown command");
