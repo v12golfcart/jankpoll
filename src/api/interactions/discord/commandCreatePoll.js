@@ -77,17 +77,10 @@ const createPoll = (req, res) => {
           },
           // responses
           {
-            // title: "Results",
             description: "_Poll must be closed before responses are shown._",
-            // fields: [
-            //   {
-            //     name: "Answered by:",
-            //     value: "<@301969677100515328>, <@437618149505105920>",
-            //     inline: "false",
-            //   },
-            // ],
           },
         ],
+        // choices
         components: [
           {
             type: 1,
@@ -100,17 +93,22 @@ const createPoll = (req, res) => {
               };
             }),
           },
-          {
-            type: 1,
-            components: [
-              {
-                type: 2,
-                label: "Close poll",
-                style: 4,
-                custom_id: "close",
-              },
-            ],
-          },
+          // show an end poll button if responses are set to hidden
+          ...(resultsAreHidden
+            ? [
+                {
+                  type: 1,
+                  components: [
+                    {
+                      type: 2,
+                      label: "Close poll",
+                      style: 4,
+                      custom_id: `poll/${pollCommandId}/close`,
+                    },
+                  ],
+                },
+              ]
+            : []),
         ],
       };
     };

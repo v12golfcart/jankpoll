@@ -8,6 +8,7 @@ require("../../../utils").endpointTestRoute(router);
 router.use(verificationCheck);
 // router.use(authenticationCheck);
 
+// clean and process the command
 router.post("/", (req, res) => {
   const body = req.body;
   let command;
@@ -23,7 +24,7 @@ router.post("/", (req, res) => {
         ? "create-" + body.data.options[0].name
         : body.data.name;
 
-  // handling command
+  // route command
   switch (command) {
     case "help":
       require("./commandHelp")(req, res);
