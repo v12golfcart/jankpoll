@@ -15,7 +15,7 @@ router.post("/", (req, res) => {
   // handling command
   switch (command) {
     case "help":
-      require("./help")(req, res);
+      require("./commandHelp")(req, res);
       break;
     default:
       res.send("Unknown command");

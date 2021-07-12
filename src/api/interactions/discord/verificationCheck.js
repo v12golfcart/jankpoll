@@ -1,5 +1,5 @@
 const nacl = require("tweetnacl");
-const { DISCORD_CLIENT_PUBLIC_KEY } = process.env;
+const { DISCORD_CLIENT_PUBLIC_KEY } = require("../../../config/environment");
 
 const verificationCheck = (req, res, next) => {
   try {

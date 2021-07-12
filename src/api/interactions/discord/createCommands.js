@@ -22,7 +22,6 @@ router.get("/help/", async (req, res) => {
       body: JSON.stringify(helpRequest),
     });
     const data = await response.json();
-    console.log("command res", data, data.errors);
     res.send(data);
   } catch (e) {
     console.error(e.message);
@@ -114,7 +113,6 @@ router.get("/create/", async (req, res) => {
       body: JSON.stringify(create),
     });
     const data = await response.json();
-    console.log("command res", data, data.errors);
     res.send(data);
   } catch (e) {
     console.error(e.message);
