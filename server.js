@@ -5,11 +5,23 @@ const { port, devEnv, JWTsecret } = require("./src/config/environment");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const { reqTestMessage, endpointTestRoute } = require("./src/utils");
+const {
+  communityModel,
+  pollModel,
+  choiceModel,
+  responseModel,
+  leaderboardModel,
+} = require("./src/services/models");
 
 /* ++++++++++++++++++++++++
 Initialize services
 ++++++++++++++++++++++++ */
 const app = express();
+communityModel.createCommunityTable();
+pollModel.createPollTable();
+choiceModel.createChoiceTable();
+responseModel.createResponseTable();
+leaderboardModel.createLeaderboardTable();
 
 /* ++++++++++++++++++++++++
 Middleware

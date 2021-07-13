@@ -6,6 +6,8 @@ const {
   DISCORD_CILENT_SECRET,
   DISCORD_CLIENT_PUBLIC_KEY,
   DISCORD_BOT_TOKEN,
+  PGUSER,
+  PGDATABASE,
 } = process.env;
 let root = "https://jankpoll.ngrok.io";
 
@@ -23,6 +25,9 @@ const environment = {
   DISCORD_CILENT_SECRET,
   DISCORD_CLIENT_PUBLIC_KEY,
   DISCORD_BOT_TOKEN,
+  // db
+  PGUSER,
+  PGDATABASE,
 };
 
 module.exports = environment;
