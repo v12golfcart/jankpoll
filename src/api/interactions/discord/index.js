@@ -40,6 +40,4 @@ router.post("/", (req, res) => {
   }
 });
 
-router.get("/create/help");
-
 module.exports = router;
