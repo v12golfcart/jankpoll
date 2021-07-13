@@ -1,7 +1,7 @@
 const { pool } = require("../database");
 
 const model = {
-  response_id: "serial",
+  response_id: "bigint primary key",
   created_ts: "timestamp",
   choice_id: "int",
   choice_n: "int",
@@ -46,5 +46,6 @@ const createResponseTable = async () => {
 // update community
 
 module.exports = {
+  model,
   createResponseTable,
 };

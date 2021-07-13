@@ -1,9 +1,16 @@
 const { pool } = require("../database");
+const { dbLookup, dbAddRecord, isoToPsql } = require("../../utils");
 
 const model = {
-  community_id: "bigint",
+  community_id: "bigint PRIMARY KEY",
+  community_name: "varchar",
+  community_icon: "varchar",
   created_ts: "timestamp",
   discord_admin_id: "bigint",
+  discord_username: "varchar",
+  discord_discriminator: "varchar",
+  discord_avatar: "varchar",
+  discord_email: "varchar",
 };
 
 // create table
@@ -25,12 +32,47 @@ const createCommunityTable = async () => {
   }
 };
 
-// fetch community by id
+// lookup community by id
+const lookupCommunityById = async (id) => {
+  return await dbLookup(pool, "communities", "community_id", id);
+};
 
-// add community
+// create community
+const createCommunity = async ({
+  community_id,
+  community_name,
+  community_icon,
+  discord_admin_id,
+  discord_username,
+  discord_discriminator,
+  discord_avatar,
+  discord_email,
+}) => {
+  const created_ts = isoToPsql(new Date().toISOString());
+  return await dbAddRecord(
+    pool,
+    "communities",
+    model,
+    {
+      community_id,
+      community_name,
+      community_icon,
+      created_ts,
+      discord_admin_id,
+      discord_username,
+      discord_discriminator,
+      discord_avatar,
+      discord_email,
+    },
+    ["community_id"]
+  );
+};
 
 // update community
 
 module.exports = {
+  model,
   createCommunityTable,
+  lookupCommunityById,
+  createCommunity,
 };

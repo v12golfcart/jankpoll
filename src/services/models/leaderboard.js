@@ -1,7 +1,7 @@
 const { pool } = require("../database");
 
 const model = {
-  leaderboard_id: "serial",
+  leaderboard_id: "serial primary key",
   created_ts: "timestamp",
   community_id: "bigint",
   discord_creator_id: "bigint",
@@ -37,5 +37,6 @@ const createLeaderboardTable = async () => {
 // update community
 
 module.exports = {
+  model,
   createLeaderboardTable,
 };

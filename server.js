@@ -17,6 +17,7 @@ const {
 Initialize services
 ++++++++++++++++++++++++ */
 const app = express();
+// creating db tables if they don't exist
 communityModel.createCommunityTable();
 pollModel.createPollTable();
 choiceModel.createChoiceTable();

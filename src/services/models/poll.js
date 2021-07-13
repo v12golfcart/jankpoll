@@ -1,7 +1,7 @@
 const { pool } = require("../database");
 
 const model = {
-  poll_id: "bigint",
+  poll_id: "bigint primary key",
   created_ts: "timestamp",
   community_id: "bigint",
   discord_creator_id: "bigint",
@@ -18,11 +18,11 @@ const model = {
   quiz_leaderboard_id: "bigint",
 };
 
-const pollTypes = {
-  1: "poll",
-  2: "quiz",
-  3: "upvote",
-};
+// const pollTypes = {
+//   1: "poll",
+//   2: "quiz",
+//   3: "upvote",
+// };
 
 // create table
 const createPollTable = async () => {
@@ -50,5 +50,6 @@ const createPollTable = async () => {
 // update community
 
 module.exports = {
+  model,
   createPollTable,
 };

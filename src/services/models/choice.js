@@ -1,7 +1,7 @@
 const { pool } = require("../database");
 
 const model = {
-  choice_id: "serial",
+  choice_id: "serial primary key",
   poll_id: "bigint",
   created_ts: "timestamp",
   community_id: "bigint",
@@ -48,5 +48,6 @@ const createChoiceTable = async () => {
 // update community
 
 module.exports = {
+  model,
   createChoiceTable,
 };

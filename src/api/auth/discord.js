@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const fetch = require("node-fetch");
 const { baseURL, apiURL } = require("../../config/environment");
+const { communityModel } = require("../../services/models");
 
 const { DISCORD_CLIENT_ID, DISCORD_CILENT_SECRET } = process.env;
 
@@ -18,7 +19,6 @@ function _encode(obj) {
 
 // auth
 const redirect = `${apiURL}/api/auth/discord/callback`;
-console.log("redirect", redirect);
 const scopes = ["identify", "email", "bot", "applications.commands"];
 
 router.get("/", (req, res) => {
@@ -58,11 +58,29 @@ router.get("/callback", async (req, res) => {
     // convert response to json
     const json = await response.json();
 
+    // use token to fetch user info
+    const userDataRes = await fetch("https://discord.com/api/v9/users/@me", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${json.access_token}`,
+      },
+    });
+    const userData = await userDataRes.json();
+
     // save response in db
     if (!json.access_token) throw new Error("No proper access JSON response");
 
-    const created_ts = new Date().toISOString();
-    console.log(`Need to save info to db for ${guild_id}`, json);
+    console.log(`Need to save info to db for ${guild_id}`, json, userData);
+    await communityModel.createCommunity({
+      community_id: json.guild.id,
+      community_name: json.guild.name,
+      community_icon: json.guild.icon,
+      discord_admin_id: userData.id,
+      discord_username: userData.username,
+      discord_discriminator: userData.discriminator,
+      discord_avatar: userData.avatar,
+      discord_email: userData.email,
+    });
 
     // redirect to success
     res.redirect(`${baseURL}/`);
