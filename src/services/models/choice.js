@@ -1,4 +1,5 @@
 const { pool } = require("../database");
+const { dbLookup, dbAddRecord, isoToPsql } = require("../../utils");
 
 const model = {
   choice_id: "serial primary key",
@@ -41,13 +42,72 @@ const createChoiceTable = async () => {
   }
 };
 
-// fetch community by id
+// lookup choice by id
+const lookupChoicesByPollId = async (poll_id) => {
+  return await dbLookup(pool, "choices", model, "poll_id", poll_id, false);
+};
 
-// add community
+// create choice
+const createChoice = async ({
+  poll_id,
+  community_id,
+  discord_creator_id,
+  discord_username,
+  discord_discriminator,
+  discord_avatar,
+  poll_type,
+  poll_message_id,
+  poll_prompt_value,
+  poll_prompt_img_url,
+  poll_is_multi_choice,
+  poll_is_anonymous,
+  poll_responses_hidden,
+  poll_quiz_leaderboard_id,
+  choice_n,
+  choice_value,
+  choice_is_correct,
+}) => {
+  const created_ts = isoToPsql(new Date().toISOString());
+  return await dbAddRecord(
+    pool,
+    "choices",
+    model,
+    {
+      poll_id,
+      created_ts,
+      community_id,
+      discord_creator_id,
+      discord_username,
+      discord_discriminator,
+      discord_avatar,
+      poll_type,
+      poll_message_id,
+      poll_prompt_value,
+      poll_prompt_img_url,
+      poll_is_multi_choice,
+      poll_is_anonymous,
+      poll_responses_hidden,
+      poll_quiz_leaderboard_id,
+      choice_n,
+      choice_value,
+      choice_is_correct,
+    },
+    [
+      "poll_id",
+      "community_id",
+      "poll_type",
+      "choice_n",
+      "choice_value",
+      "choice_is_correct",
+    ]
+  );
+};
 
 // update community
 
 module.exports = {
   model,
   createChoiceTable,
+  lookupChoicesByPollId,
+  createChoice,
 };

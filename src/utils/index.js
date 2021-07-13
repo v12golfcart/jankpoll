@@ -40,7 +40,14 @@ const mapTableToModel = {
   leaderboards: "leaderboard",
 };
 
-const dbLookup = async (pool, table, model, lookupCol, searchValue) => {
+const dbLookup = async (
+  pool,
+  table,
+  model,
+  lookupCol,
+  searchValue,
+  findOne = true
+) => {
   const client = await pool.connect();
 
   // build query
@@ -54,14 +61,14 @@ const dbLookup = async (pool, table, model, lookupCol, searchValue) => {
       `Looking for ${mapTableToModel[table]} ${searchValue} (${lookupCol})`
     );
     const res = await client.query(queryText);
-    if (res.rowCount > 1) {
+    if (findOne && res.rowCount > 1) {
       throw new Error(
         `ERROR: Lookup found ${res.rowCount} records: ${res.rows.map(
           (i) => " " + i.email
         )}`
       );
     }
-    const record = res.rows[0];
+    const record = findOne ? res.rows[0] : res.rows;
     console.log(`Results for ${mapTableToModel[table]} lookup:`, record);
     return record;
   } catch (e) {
