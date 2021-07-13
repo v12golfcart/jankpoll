@@ -3,6 +3,7 @@ const favicon = require("express-favicon");
 const path = require("path");
 const { port, devEnv, JWTsecret } = require("./src/config/environment");
 const cookieParser = require("cookie-parser");
+const cors = require("cors");
 const { reqTestMessage, endpointTestRoute } = require("./src/utils");
 
 /* ++++++++++++++++++++++++
@@ -14,6 +15,7 @@ const app = express();
 Middleware
 ++++++++++++++++++++++++ */
 endpointTestRoute(app);
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser(JWTsecret));
