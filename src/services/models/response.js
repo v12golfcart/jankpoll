@@ -1,4 +1,5 @@
 const { pool } = require("../database");
+const { dbLookup, dbAddRecord, isoToPsql } = require("../../utils");
 
 const model = {
   response_id: "bigint primary key",
@@ -39,13 +40,76 @@ const createResponseTable = async () => {
   }
 };
 
-// fetch community by id
+// lookup response by id
 
-// add community
+// create response
+const createResponse = async ([
+  {
+    response_id,
+    choice_id,
+    choice_n,
+    choice_value,
+    choice_is_correct,
+    community_id,
+    poll_id,
+    poll_type,
+    poll_quiz_leaderboard_id,
+    discord_responder_id,
+    discord_username,
+    discord_discriminator,
+    discord_avatar,
+    response_value,
+    response_quiz_bet,
+    response_quiz_outcome,
+  },
+]) => {
+  const created_ts = isoToPsql(new Date().toISOString());
+  return await dbAddRecord(
+    pool,
+    "responses",
+    model,
+    [
+      {
+        response_id,
+        created_ts,
+        choice_id,
+        choice_n,
+        choice_value,
+        choice_is_correct,
+        community_id,
+        poll_id,
+        poll_type,
+        poll_quiz_leaderboard_id,
+        discord_responder_id,
+        discord_username,
+        discord_discriminator,
+        discord_avatar,
+        response_value,
+        response_quiz_bet,
+        response_quiz_outcome,
+      },
+    ],
+    [
+      "response_id",
+      "created_ts",
+      "choice_id",
+      "choice_n",
+      "choice_value",
+      "community_id",
+      "poll_id",
+      "poll_type",
+      "discord_responder_id",
+      "discord_username",
+      "discord_discriminator",
+      "response_value",
+    ]
+  );
+};
 
 // update community
 
 module.exports = {
   model,
   createResponseTable,
+  createResponse,
 };
