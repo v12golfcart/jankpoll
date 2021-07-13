@@ -38,33 +38,45 @@ const lookupCommunityById = async (id) => {
 };
 
 // create community
-const createCommunity = async ({
-  community_id,
-  community_name,
-  community_icon,
-  discord_admin_id,
-  discord_username,
-  discord_discriminator,
-  discord_avatar,
-  discord_email,
-}) => {
+const createCommunity = async ([
+  {
+    community_id,
+    community_name,
+    community_icon,
+    discord_admin_id,
+    discord_username,
+    discord_discriminator,
+    discord_avatar,
+    discord_email,
+  },
+]) => {
   const created_ts = isoToPsql(new Date().toISOString());
   return await dbAddRecord(
     pool,
     "communities",
     model,
-    {
-      community_id,
-      community_name,
-      community_icon,
-      created_ts,
-      discord_admin_id,
-      discord_username,
-      discord_discriminator,
-      discord_avatar,
-      discord_email,
-    },
-    ["community_id"]
+    [
+      {
+        community_id,
+        community_name,
+        community_icon,
+        created_ts,
+        discord_admin_id,
+        discord_username,
+        discord_discriminator,
+        discord_avatar,
+        discord_email,
+      },
+    ],
+    [
+      "community_id",
+      "community_name",
+      "created_ts",
+      "discord_admin_id",
+      "discord_username",
+      "discord_discriminator",
+      "discord_email",
+    ]
   );
 };
 

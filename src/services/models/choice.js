@@ -48,57 +48,32 @@ const lookupChoicesByPollId = async (poll_id) => {
 };
 
 // create choice
-const createChoice = async ({
-  poll_id,
-  community_id,
-  discord_creator_id,
-  discord_username,
-  discord_discriminator,
-  discord_avatar,
-  poll_type,
-  poll_message_id,
-  poll_prompt_value,
-  poll_prompt_img_url,
-  poll_is_multi_choice,
-  poll_is_anonymous,
-  poll_responses_hidden,
-  poll_quiz_leaderboard_id,
-  choice_n,
-  choice_value,
-  choice_is_correct,
-}) => {
+const createChoice = async (choicesArr) => {
   const created_ts = isoToPsql(new Date().toISOString());
   return await dbAddRecord(
     pool,
     "choices",
     model,
-    {
-      poll_id,
-      created_ts,
-      community_id,
-      discord_creator_id,
-      discord_username,
-      discord_discriminator,
-      discord_avatar,
-      poll_type,
-      poll_message_id,
-      poll_prompt_value,
-      poll_prompt_img_url,
-      poll_is_multi_choice,
-      poll_is_anonymous,
-      poll_responses_hidden,
-      poll_quiz_leaderboard_id,
-      choice_n,
-      choice_value,
-      choice_is_correct,
-    },
+    choicesArr.map((i) => {
+      return {
+        ...i,
+        created_ts,
+      };
+    }),
     [
       "poll_id",
+      "created_ts",
       "community_id",
+      "discord_creator_id",
+      "discord_username",
+      "discord_discriminator",
       "poll_type",
+      "poll_prompt_value",
+      "poll_is_multi_choice",
+      "poll_is_anonymous",
+      "poll_responses_hidden",
       "choice_n",
       "choice_value",
-      "choice_is_correct",
     ]
   );
 };

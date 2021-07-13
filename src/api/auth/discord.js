@@ -70,16 +70,18 @@ router.get("/callback", async (req, res) => {
     // save response in db
     if (!json.access_token) throw new Error("No proper access JSON response");
 
-    await communityModel.createCommunity({
-      community_id: json.guild.id,
-      community_name: json.guild.name,
-      community_icon: json.guild.icon,
-      discord_admin_id: userData.id,
-      discord_username: userData.username,
-      discord_discriminator: userData.discriminator,
-      discord_avatar: userData.avatar,
-      discord_email: userData.email,
-    });
+    await communityModel.createCommunity([
+      {
+        community_id: json.guild.id,
+        community_name: json.guild.name,
+        community_icon: json.guild.icon,
+        discord_admin_id: userData.id,
+        discord_username: userData.username,
+        discord_discriminator: userData.discriminator,
+        discord_avatar: userData.avatar,
+        discord_email: userData.email,
+      },
+    ]);
 
     // redirect to success
     res.redirect(`${baseURL}/`);

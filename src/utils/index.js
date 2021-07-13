@@ -1,3 +1,5 @@
+const format = require("pg-format");
+
 /* ++++++++++++++++++++++++
 General Utils
 ++++++++++++++++++++++++ */
@@ -81,45 +83,59 @@ const dbLookup = async (
   }
 };
 
-const dbAddRecord = async (pool, table, model, payloadOjb, reqFieldsArray) => {
-  // validation
-  // (1) take the payload obj make sure all fields are in model and non-null
-  const payloadOjbCleaned = Object.keys(payloadOjb)
-    .filter(
-      (i) => Object.keys(model).includes(i) && payloadOjb[i] !== undefined
-    ) // only key/values in model
-    .reduce((acc, key) => {
-      return {
-        ...acc,
-        [key]: payloadOjb[key],
-      };
-    }, {}); // recombine in an obj
-  // (2) make sure all required fields are present
-  if (reqFieldsArray && reqFieldsArray.length > 0) {
-    const missingFields = reqFieldsArray.filter(
-      (i) => !Object.keys(payloadOjbCleaned).includes(i)
-    );
-    if (missingFields.length > 0)
-      throw new Error(`Missing required fields: ${missingFields.join(", ")}`);
-  }
-
-  // build query
+const dbAddRecord = async (pool, table, model, payloadArr, reqFieldsArray) => {
   const client = await pool.connect();
-  const queryText = `INSERT INTO ${table} (${Object.keys(
-    payloadOjbCleaned
-  ).join(", ")}) VALUES (${Object.keys(payloadOjbCleaned)
-    .map((i) =>
-      ["varchar", "timestamp"].includes(model[i])
-        ? `'${payloadOjbCleaned[i]}'`
-        : `${payloadOjbCleaned[i]}`
-    )
-    .join(", ")}) returning *`;
 
-  // send request
   try {
-    const res = await client.query(queryText);
-    console.log(`Added ${mapTableToModel[table]}`, res.rows[0]);
-    return res.rows[0];
+    // validation
+    const validatePayloadItem = (payloadObj) => {
+      // (1) take the payload obj make sure all fields are in model and non-null
+      const payloadObjCleaned = Object.keys(payloadObj)
+        .filter(
+          (i) => Object.keys(model).includes(i) && payloadObj[i] !== undefined
+        ) // only key/values in model
+        .reduce((acc, key) => {
+          return {
+            ...acc,
+            [key]: payloadObj[key],
+          };
+        }, {}); // recombine in an obj
+      // (2) make sure all required fields are present
+      if (reqFieldsArray && reqFieldsArray.length > 0) {
+        const missingFields = reqFieldsArray.filter(
+          (i) => !Object.keys(payloadObjCleaned).includes(i)
+        );
+        if (missingFields.length > 0)
+          throw new Error(
+            `Missing required fields: ${missingFields.join(", ")}`
+          );
+      }
+      return payloadObjCleaned;
+    };
+
+    const payloadArrCleaned = payloadArr.map((i) => validatePayloadItem(i));
+
+    // build query
+    const cols = Object.keys(payloadArrCleaned[0]).join(", "); // chooses first value and builds cols; assumes they're all the same
+    const values = payloadArrCleaned.map((i) => Object.values(i));
+    const query = format(
+      `INSERT INTO ${table} (${cols}) VALUES %L returning *`,
+      values
+    );
+    // const queryText = `INSERT INTO ${table} (${Object.keys(
+    //   payloadObjCleaned
+    // ).join(", ")}) VALUES (${Object.keys(payloadObjCleaned)
+    //   .map((i) =>
+    //     ["varchar", "timestamp"].includes(model[i])
+    //       ? `'${payloadObjCleaned[i]}'`
+    //       : `${payloadObjCleaned[i]}`
+    //   )
+    //   .join(", ")}) returning *`;
+
+    // send request
+    const res = await client.query(query);
+    console.log(`Added ${mapTableToModel[table]}`, res.rows);
+    return res.rows;
   } catch (e) {
     console.error(`Error adding a record to ${table}: `, e.message);
   } finally {
