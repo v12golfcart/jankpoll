@@ -40,9 +40,7 @@ const mapTableToModel = {
   leaderboards: "leaderboard",
 };
 
-const dbLookup = async (pool, table, lookupCol, searchValue) => {
-  // get model
-  const model = require(`../services/models`)[mapTableToModel[table]];
+const dbLookup = async (pool, table, model, lookupCol, searchValue) => {
   const client = await pool.connect();
 
   // build query
@@ -63,10 +61,14 @@ const dbLookup = async (pool, table, lookupCol, searchValue) => {
         )}`
       );
     }
-    const user = res.rows[0];
-    return user;
+    const record = res.rows[0];
+    console.log(`Results for ${mapTableToModel[table]} lookup:`, record);
+    return record;
   } catch (e) {
-    console.error("Error with lookupUser: ", e.message);
+    console.error(
+      `Error with lookup for ${mapTableToModel[table]}: `,
+      e.message
+    );
   } finally {
     client.release();
   }

@@ -34,7 +34,7 @@ const createCommunityTable = async () => {
 
 // lookup community by id
 const lookupCommunityById = async (id) => {
-  return await dbLookup(pool, "communities", "community_id", id);
+  return await dbLookup(pool, "communities", model, "community_id", id);
 };
 
 // create community

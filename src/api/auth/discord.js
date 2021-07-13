@@ -70,7 +70,6 @@ router.get("/callback", async (req, res) => {
     // save response in db
     if (!json.access_token) throw new Error("No proper access JSON response");
 
-    console.log(`Need to save info to db for ${guild_id}`, json, userData);
     await communityModel.createCommunity({
       community_id: json.guild.id,
       community_name: json.guild.name,
