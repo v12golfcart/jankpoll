@@ -40,7 +40,10 @@ const createResponseTable = async () => {
   }
 };
 
-// lookup response by id
+// get all responses by poll id
+const fetchResponsesByPollId = async (poll_id) => {
+  return await dbLookup(pool, "responses", model, "poll_id", poll_id, false);
+};
 
 // create response
 const createResponse = async ([
@@ -112,4 +115,5 @@ module.exports = {
   model,
   createResponseTable,
   createResponse,
+  fetchResponsesByPollId,
 };

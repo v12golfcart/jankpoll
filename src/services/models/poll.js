@@ -9,13 +9,13 @@ const model = {
   discord_username: "varchar",
   discord_discriminator: "varchar",
   discord_avatar: "varchar",
-  message_id: "bigint",
+  poll_message_id: "bigint",
   poll_type: "int",
-  prompt_value: "varchar",
-  prompt_img_url: "varchar",
-  is_multi_choice: "boolean",
-  is_anonymous: "boolean",
-  responses_hidden: "boolean",
+  poll_prompt_value: "varchar",
+  poll_prompt_img_url: "varchar",
+  poll_is_multi_choice: "boolean",
+  poll_is_anonymous: "boolean",
+  poll_responses_hidden: "boolean",
   quiz_leaderboard_id: "bigint",
 };
 
@@ -58,13 +58,13 @@ const createPoll = async ([
     discord_username,
     discord_discriminator,
     discord_avatar,
-    message_id,
+    poll_message_id,
     poll_type,
-    prompt_value,
-    prompt_img_url,
-    is_multi_choice,
-    is_anonymous,
-    responses_hidden,
+    poll_prompt_value,
+    poll_prompt_img_url,
+    poll_is_multi_choice,
+    poll_is_anonymous,
+    poll_responses_hidden,
     quiz_leaderboard_id,
   },
 ]) => {
@@ -82,13 +82,13 @@ const createPoll = async ([
         discord_username,
         discord_discriminator,
         discord_avatar,
-        message_id,
+        poll_message_id,
         poll_type,
-        prompt_value,
-        prompt_img_url,
-        is_multi_choice,
-        is_anonymous,
-        responses_hidden,
+        poll_prompt_value,
+        poll_prompt_img_url,
+        poll_is_multi_choice,
+        poll_is_anonymous,
+        poll_responses_hidden,
         quiz_leaderboard_id,
       },
     ],
@@ -104,7 +104,29 @@ const createPoll = async ([
   );
 };
 
-// update community
+// build poll from db
+const getFullPollStateByPollId = async (poll_id) => {
+  const client = await pool.connect();
+  try {
+    // get all choices
+    const choicesQuery = `SELECT * FROM choices WHERE poll_id = ${poll_id}`;
+    const choicesRes = await client.query(choicesQuery);
+    const choicesData = choicesRes.rows;
+    console.log("found choices", choicesData);
+
+    // get all responses
+    const responsesQuery = `SELECT * FROM responses WHERE poll_id = ${poll_id}`;
+    const responsesRes = await client.query(responsesQuery);
+    const responsesData = responsesRes.rows;
+    console.log("found responses", responsesData);
+  } catch (e) {
+    console.error("Error with fetching full poll state: ", e.message);
+  } finally {
+    client.release();
+  }
+};
+
+getFullPollStateByPollId("864652571976138752");
 
 module.exports = {
   model,

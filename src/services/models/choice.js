@@ -42,8 +42,8 @@ const createChoiceTable = async () => {
   }
 };
 
-// lookup choice by id
-const lookupChoicesByPollId = async (poll_id) => {
+// get all choices by poll id
+const fetchChoicesByPollId = async (poll_id) => {
   return await dbLookup(pool, "choices", model, "poll_id", poll_id, false);
 };
 
@@ -83,6 +83,6 @@ const createChoice = async (choicesArr) => {
 module.exports = {
   model,
   createChoiceTable,
-  lookupChoicesByPollId,
+  fetchChoicesByPollId,
   createChoice,
 };

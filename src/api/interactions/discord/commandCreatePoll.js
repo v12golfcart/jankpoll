@@ -1,4 +1,4 @@
-const { pollModel } = require("../../../services/models");
+const { pollModel, choiceModel } = require("../../../services/models");
 
 const createPoll = async (req, res) => {
   const pollData = req.body.data.options[0].options;
@@ -115,8 +115,8 @@ const createPoll = async (req, res) => {
       };
     };
 
-    // save new poll to db
-    await pollModel.createPoll({
+    // save new poll and choices to db
+    const pollBlob = {
       poll_id: poll.poll_id,
       community_id: poll.community_id,
       discord_creator_id: pollCreator.id,
@@ -124,12 +124,26 @@ const createPoll = async (req, res) => {
       discord_discriminator: pollCreator.discriminator,
       discord_avatar: pollCreator.avatar,
       poll_type: 1,
-      prompt_value: poll.prompt_value,
-      prompt_img_url: poll.prompt_img_url,
-      is_multi_choice: poll.is_multi_choice,
-      is_anonymous: poll.is_anonymous,
-      responses_hidden: poll.responses_hidden,
-    });
+      poll_prompt_value: poll.prompt_value,
+      poll_prompt_img_url: poll.prompt_img_url,
+      poll_is_multi_choice: poll.is_multi_choice,
+      poll_is_anonymous: poll.is_anonymous,
+      poll_responses_hidden: poll.responses_hidden,
+    };
+    await pollModel.createPoll([
+      {
+        ...pollBlob,
+      },
+    ]);
+    await choiceModel.createChoice(
+      poll.choices.map((i, index) => {
+        return {
+          ...pollBlob,
+          choice_n: index + 1,
+          choice_value: i.value,
+        };
+      })
+    );
 
     res.status(200).send({
       type: 4,
