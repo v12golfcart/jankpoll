@@ -112,13 +112,59 @@ const getFullPollStateByPollId = async (poll_id) => {
     const choicesQuery = `SELECT * FROM choices WHERE poll_id = ${poll_id}`;
     const choicesRes = await client.query(choicesQuery);
     const choicesData = choicesRes.rows;
-    console.log("found choices", choicesData);
+    let poll;
 
-    // get all responses
-    const responsesQuery = `SELECT * FROM responses WHERE poll_id = ${poll_id}`;
-    const responsesRes = await client.query(responsesQuery);
-    const responsesData = responsesRes.rows;
-    console.log("found responses", responsesData);
+    // if found a poll, populate it
+    if (choicesData.length > 0) {
+      const referencePollData = choicesData[0];
+
+      // get all responses
+      const responsesQuery = `SELECT * FROM responses WHERE poll_id = ${poll_id}`;
+      const responsesRes = await client.query(responsesQuery);
+      const responsesData = responsesRes.rows;
+
+      const transformResponses = (responses, choice_n) => {
+        if (responses && responses.length > 0) {
+          return responses
+            .filter((i) => i.choice_n === choice_n)
+            .map((i) => {
+              return {
+                id: i.discord_responder_id,
+                username: i.discord_username,
+                discriminator: i.discord_discriminator,
+                avatar: i.discord_avatar,
+              };
+            });
+        } else {
+          return [];
+        }
+      };
+
+      poll = {
+        pollCreator: {
+          id: referencePollData.discord_creator_id,
+          username: referencePollData.discord_username,
+          discriminator: referencePollData.discord_discriminator,
+          avatar: referencePollData.discord_avatar,
+        },
+        poll_id: referencePollData.poll_id,
+        community_id: referencePollData.community_id,
+        pollChannelId: null,
+        prompt_value: referencePollData.poll_prompt_value,
+        prompt_img_url: referencePollData.poll_prompt_img_url,
+        is_multi_choice: referencePollData.poll_is_multi_choice,
+        responses_hidden: referencePollData.poll_responses_hidden,
+        is_anonymous: referencePollData.poll_is_anonymous,
+        choices: choicesData.map((i) => {
+          return {
+            n: i.choice_n,
+            value: i.choice_value,
+            respondents: transformResponses(responsesData, i.choice_n),
+          };
+        }),
+      };
+    }
+    return poll;
   } catch (e) {
     console.error("Error with fetching full poll state: ", e.message);
   } finally {
@@ -126,11 +172,10 @@ const getFullPollStateByPollId = async (poll_id) => {
   }
 };
 
-getFullPollStateByPollId("864652571976138752");
-
 module.exports = {
   model,
   createPollTable,
   lookupPollById,
   createPoll,
+  getFullPollStateByPollId,
 };
