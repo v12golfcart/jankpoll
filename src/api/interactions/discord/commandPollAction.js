@@ -3,7 +3,6 @@ const {
   responseModel,
   choiceModel,
 } = require("../../../services/models");
-const { fetchChoicesByPollId } = require("../../../services/models/choice");
 
 const pollAction = (req, res) => {
   const { id, member } = req.body;
@@ -19,7 +18,7 @@ const pollAction = (req, res) => {
   const voteOnPoll = async () => {
     try {
       // get the choice
-      const choices = await fetchChoicesByPollId(poll_id);
+      const choices = await choiceModel.fetchChoicesByPollId(poll_id);
       const choice = choices.filter((i) => i.choice_n === choice_n)[0];
 
       // save the response to db
@@ -41,6 +40,7 @@ const pollAction = (req, res) => {
 
       // rebuild full poll
       const poll = await pollModel.getFullPollStateByPollId(poll_id);
+      console.log("poll", poll);
 
       // reply with an ephemeral message about captured responses
       // i dunno how to do this
