@@ -19,6 +19,28 @@ const renderPromptEmbed = (pollData, isActive = true) => {
   };
 };
 
+const renderResponseEmbed = (pollData, isActive = false) => {
+  const allRespondents = new Set();
+  pollData.choices.map((i) => {
+    // for each choice, loop through respondants and add to set
+    i.respondents.map((i) => allRespondents.add(`${i.username}`));
+  });
+
+  if (isActive) {
+    return {
+      description: `_Results!!!_`,
+    };
+  } else {
+    return {
+      description: `_Poll must be closed before responses are shown._\n
+      ${allRespondents.size} responses${
+        allRespondents.size > 0 ? `: ${[...allRespondents].join(", ")}` : ``
+      }
+      `,
+    };
+  }
+};
+
 const renderPoll = (pollData) => {
   const {
     pollCreator,
@@ -37,9 +59,7 @@ const renderPoll = (pollData) => {
       // question
       renderPromptEmbed(pollData),
       // responses
-      {
-        description: "_Poll must be closed before responses are shown._",
-      },
+      renderResponseEmbed(pollData),
     ],
     // choices
     components: [

@@ -1,4 +1,5 @@
 const { pollModel, responseModel } = require("../../../services/models");
+const { discordMessageRendering } = require("../../../utils");
 
 const pollAction = (req, res) => {
   const { id, member } = req.body;
@@ -26,9 +27,7 @@ const pollAction = (req, res) => {
       // update the poll
       res.send({
         type: 7,
-        data: {
-          content: "some action",
-        },
+        data: discordMessageRendering.renderPoll(poll),
       });
     } catch (e) {
       console.error("Error handling user response: ", e.message);
