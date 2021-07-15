@@ -1,11 +1,13 @@
-const { emojiMap } = require("./maps");
+const { emojiChoices, emojiBarColors } = require("./maps");
 
 const renderPromptEmbed = (pollData, isActive = true) => {
   const { pollCreator, prompt_value, prompt_img_url, choices } = pollData;
   const { avatar, discriminator, username, id } = pollCreator;
   return {
     title: prompt_value,
-    description: choices.map((i) => `${emojiMap[i.n]} ${i.value}`).join("\n"),
+    description: choices
+      .map((i) => `${emojiChoices[i.n]} ${i.value}`)
+      .join("\n"),
     color: isActive && "41667",
     image: {
       url: prompt_img_url,
@@ -20,9 +22,33 @@ const renderPromptEmbed = (pollData, isActive = true) => {
 };
 
 const renderResponseEmbed = (pollData, respondentsSet, isActive = false) => {
+  const totalResponses = pollData.choices.reduce((acc, i) => {
+    return acc + i.respondents.length;
+  }, 0);
+
+  const renderBar = (n, size, numResponses) => {
+    return `${emojiChoices[n]}:${emojiBarColors[n].repeat(
+      size
+    )} (${numResponses})`;
+  };
+
+  const renderGraph = (pollData, totalResponses) => {
+    const choices = pollData.choices;
+
+    return choices
+      .map((i) => {
+        const n = i.n;
+        const numResponses = i.respondents.length;
+        const size = (numResponses / totalResponses).toFixed(1) * 10;
+        return renderBar(n, size, numResponses);
+      })
+      .join("\n");
+  };
+
   if (isActive) {
     return {
-      description: `_Results!!!_`,
+      title: `${totalResponses} Responses`,
+      description: renderGraph(pollData, totalResponses),
       color: isActive && "41667",
     };
   } else {
@@ -44,7 +70,7 @@ const renderChoices = (pollData) => {
       return {
         type: 2,
         style: 2,
-        emoji: { name: emojiMap[index + 1] },
+        emoji: { name: emojiChoices[index + 1] },
         custom_id: `poll/${poll_id}/vote/${i.n}/${pollCreator.id}`,
       };
     }),

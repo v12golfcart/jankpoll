@@ -1,10 +1,5 @@
 const { pool } = require("../database");
-const {
-  dbLookup,
-  dbAddRecord,
-  dbUpdateRecord,
-  isoToPsql,
-} = require("../../utils");
+const { dbLookup, dbAddRecord, isoToPsql } = require("../../utils");
 
 const model = {
   poll_id: "bigint primary key",
