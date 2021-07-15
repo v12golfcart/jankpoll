@@ -1,16 +1,33 @@
 const { emojiMap } = require("./maps");
 
-const renderPoll = ({
-  pollCreator,
-  poll_id,
-  prompt_value,
-  prompt_img_url,
-  is_multi_choice,
-  responses_hidden,
-  // is_anonymous,
-  choices,
-}) => {
+const renderPromptEmbed = (pollData, isActive = true) => {
+  const { pollCreator, prompt_value, prompt_img_url, choices } = pollData;
   const { avatar, discriminator, username, id } = pollCreator;
+  return {
+    title: prompt_value,
+    description: choices.map((i) => `${emojiMap[i.n]} ${i.value}`).join("\n"),
+    color: isActive && "41667",
+    image: {
+      url: prompt_img_url,
+      proxy_url: prompt_img_url,
+    },
+    footer: {
+      text: `By ${username}#${discriminator}`,
+      icon_url: `https://cdn.discordapp.com/avatars/${id}/${avatar}.png`,
+      proxy_icon_url: `https://cdn.discordapp.com/avatars/${id}/${avatar}.png`,
+    },
+  };
+};
+
+const renderPoll = (pollData) => {
+  const {
+    pollCreator,
+    poll_id,
+    is_multi_choice,
+    responses_hidden,
+    // is_anonymous,
+    choices,
+  } = pollData;
 
   return {
     content: is_multi_choice
@@ -18,22 +35,7 @@ const renderPoll = ({
       : "Select one answer:",
     embeds: [
       // question
-      {
-        title: prompt_value,
-        description: choices
-          .map((i) => `${emojiMap[i.n]} ${i.value}`)
-          .join("\n"),
-        color: "41667",
-        image: {
-          url: prompt_img_url,
-          proxy_url: prompt_img_url,
-        },
-        footer: {
-          text: `By ${username}#${discriminator}`,
-          icon_url: `https://cdn.discordapp.com/avatars/${id}/${avatar}.png`,
-          proxy_icon_url: `https://cdn.discordapp.com/avatars/${id}/${avatar}.png`,
-        },
-      },
+      renderPromptEmbed(pollData),
       // responses
       {
         description: "_Poll must be closed before responses are shown._",
@@ -48,7 +50,7 @@ const renderPoll = ({
             type: 2,
             style: 2,
             emoji: { name: emojiMap[index + 1] },
-            custom_id: `poll/${poll_id}/vote/${i.n}/${username}#${discriminator}`,
+            custom_id: `poll/${poll_id}/vote/${i.n}/${pollCreator.id}`,
           };
         }),
       },
