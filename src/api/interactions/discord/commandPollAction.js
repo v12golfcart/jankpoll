@@ -1,8 +1,4 @@
-const {
-  pollModel,
-  responseModel,
-  choiceModel,
-} = require("../../../services/models");
+const { pollModel, responseModel } = require("../../../services/models");
 
 const pollAction = (req, res) => {
   const { id, member } = req.body;
@@ -17,31 +13,8 @@ const pollAction = (req, res) => {
 
   const voteOnPoll = async () => {
     try {
-      // get the choice
-      const choices = await choiceModel.fetchChoicesByPollId(poll_id);
-      const choice = choices.filter((i) => i.choice_n === choice_n)[0];
-
-      // save the response to db
-      const responseData = {
-        response_id: id,
-        choice_id: choice.choice_id,
-        choice_n,
-        choice_value: choice.choice_value,
-        community_id: choice.community_id,
-        poll_id,
-        poll_type: choice.poll_type,
-        poll_prompt_value: choice.poll_prompt_value,
-        poll_prompt_img_url: choice.poll_prompt_img_url,
-        poll_is_multi_choice: choice.poll_is_multi_choice,
-        poll_is_anonymous: choice.poll_is_anonymous,
-        poll_responses_hidden: choice.poll_responses_hidden,
-        discord_responder_id: user.id,
-        discord_username: user.username,
-        discord_discriminator: user.discriminator,
-        discord_avatar: user.avatar,
-        response_value: choice.choice_value,
-      };
-      await responseModel.createResponse([responseData]);
+      // handle poll voting
+      await responseModel.votePoll(id, poll_id, choice_n, user);
 
       // rebuild full poll
       const poll = await pollModel.getFullPollStateByPollId(poll_id);

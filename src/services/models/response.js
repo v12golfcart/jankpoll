@@ -1,6 +1,6 @@
 const { pool } = require("../database");
 const { dbLookup, dbAddRecord, isoToPsql } = require("../../utils");
-const { response } = require("express");
+const choiceModel = require("./choice");
 
 const model = {
   response_id: "bigint primary key",
@@ -60,6 +60,13 @@ const fetchUserPollResponsesByUserId = async (poll_id, user_id) => {
     userResponses = responses.filter((i) => i.discord_responder_id === user_id);
   }
   return userResponses;
+};
+
+const checkForExistingResponse = async (poll_id, choice_n, user_id) => {
+  const responses = await fetchResponsesByPollId(poll_id);
+  return responses.filter(
+    (i) => i.discord_responder_id === user_id && i.choice_n === choice_n
+  )[0];
 };
 
 // create response
@@ -136,7 +143,67 @@ const createResponse = async ([
   );
 };
 
-// update community
+// deleteResponse
+const deleteResponse = async (poll_id, choice_n, user_id) => {
+  const client = await pool.connect();
+  try {
+    const queryText = `DELETE FROM responses WHERE poll_id = ${poll_id} and choice_n = ${choice_n} and discord_responder_id = ${user_id};`;
+    await client.query(queryText);
+    console.log(
+      `Deleted response ${choice_n} from user ${user_id} from ${poll_id}`
+    );
+  } catch (e) {
+    console.error("Error with deleting a response: ", e.message);
+  } finally {
+    client.release();
+  }
+};
+
+// singleChoiceVote
+const votePoll = async (response_id, poll_id, choice_n, user) => {
+  // get the choice and response data
+  const choices = await choiceModel.fetchChoicesByPollId(poll_id);
+  const choice = choices.filter((i) => i.choice_n === choice_n)[0];
+
+  // build response data
+  const responseObj = {
+    response_id,
+    choice_id: choice.choice_id,
+    choice_n,
+    choice_value: choice.choice_value,
+    community_id: choice.community_id,
+    poll_id,
+    poll_type: choice.poll_type,
+    poll_prompt_value: choice.poll_prompt_value,
+    poll_prompt_img_url: choice.poll_prompt_img_url,
+    poll_is_multi_choice: choice.poll_is_multi_choice,
+    poll_is_anonymous: choice.poll_is_anonymous,
+    poll_responses_hidden: choice.poll_responses_hidden,
+    discord_responder_id: user.id,
+    discord_username: user.username,
+    discord_discriminator: user.discriminator,
+    discord_avatar: user.avatar,
+    response_value: choice.choice_value,
+  };
+
+  // if a response exists, delete it
+  const existingResponse = await checkForExistingResponse(
+    poll_id,
+    choice_n,
+    user.id
+  );
+  if (existingResponse) {
+    await deleteResponse(poll_id, choice_n, user.id);
+  } else {
+    if (responseObj.poll_is_multi_choice) {
+      console.log("add existing choice");
+      await createResponse([responseObj]);
+    } else {
+      const created_ts = isoToPsql(new Date().toISOString());
+      console.log(`update existing choice to ${choice_n}`);
+    }
+  }
+};
 
 module.exports = {
   model,
@@ -144,4 +211,7 @@ module.exports = {
   createResponse,
   fetchResponsesByPollId,
   fetchUserPollResponsesByUserId,
+  checkForExistingResponse,
+  deleteResponse,
+  votePoll,
 };
