@@ -53,8 +53,9 @@ const renderResponseEmbed = (pollData, respondentsSet, isActive = false) => {
     };
   } else {
     return {
-      description: `_Poll must be closed before responses are shown._\n
-      ${respondentsSet.size} responses${
+      description: `_Click Reveal to see responses._\n\n${
+        respondentsSet.size
+      } responses${
         respondentsSet.size > 0 ? `: ${[...respondentsSet].join(", ")}` : ``
       }
       `,
