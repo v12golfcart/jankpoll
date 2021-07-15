@@ -137,10 +137,13 @@ Export
 module.exports = {
   //general
   isoToPsql,
+  maps: require("./maps"),
   //api
   endpointTestRoute,
   reqTestMessage,
   //db/models
   dbLookup,
   dbAddRecord,
+  // discord commands
+  discordMessageRendering: require("./discordMessageRendering"),
 };
