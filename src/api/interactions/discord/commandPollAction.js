@@ -50,6 +50,12 @@ const pollAction = (req, res) => {
       // rebuild full poll
       const poll = await pollModel.getFullPollStateByPollId(poll_id);
       console.log("poll", poll);
+
+      // update the poll
+      res.send({
+        type: 7,
+        data: discordMessageRendering.renderPoll(poll),
+      });
     } catch (e) {
       console.error("Error handling user response: ", e.message);
       res.send({
@@ -60,12 +66,6 @@ const pollAction = (req, res) => {
         },
       });
     }
-    res.send({
-      type: 7,
-      data: {
-        content: "poll closed",
-      },
-    });
   };
 
   switch (action) {

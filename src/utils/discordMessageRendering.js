@@ -19,37 +19,70 @@ const renderPromptEmbed = (pollData, isActive = true) => {
   };
 };
 
-const renderResponseEmbed = (pollData, isActive = false) => {
-  const allRespondents = new Set();
-  pollData.choices.map((i) => {
-    // for each choice, loop through respondants and add to set
-    i.respondents.map((i) => allRespondents.add(`${i.username}`));
-  });
-
+const renderResponseEmbed = (pollData, respondentsSet, isActive = false) => {
   if (isActive) {
     return {
       description: `_Results!!!_`,
+      color: isActive && "41667",
     };
   } else {
     return {
       description: `_Poll must be closed before responses are shown._\n
-      ${allRespondents.size} responses${
-        allRespondents.size > 0 ? `: ${[...allRespondents].join(", ")}` : ``
+      ${respondentsSet.size} responses${
+        respondentsSet.size > 0 ? `: ${[...respondentsSet].join(", ")}` : ``
       }
       `,
     };
   }
 };
 
+const renderChoices = (pollData) => {
+  const { poll_id, pollCreator, choices } = pollData;
+  return {
+    type: 1,
+    components: choices.map((i, index) => {
+      return {
+        type: 2,
+        style: 2,
+        emoji: { name: emojiMap[index + 1] },
+        custom_id: `poll/${poll_id}/vote/${i.n}/${pollCreator.id}`,
+      };
+    }),
+  };
+};
+
+const renderPollActions = (pollData, allRespondentsSet) => {
+  const { poll_id, responses_hidden } = pollData;
+  return responses_hidden
+    ? [
+        {
+          type: 1,
+          components: [
+            {
+              type: 2,
+              label: "Reveal",
+              style: allRespondentsSet.size > 0 ? 3 : 4,
+              custom_id: `poll/${poll_id}/reveal`,
+            },
+          ],
+        },
+      ]
+    : [];
+};
+
 const renderPoll = (pollData) => {
   const {
-    pollCreator,
-    poll_id,
     is_multi_choice,
     responses_hidden,
     // is_anonymous,
-    choices,
   } = pollData;
+
+  // make a responses set
+  const allRespondentsSet = new Set();
+  pollData.choices.map((i) => {
+    // for each choice, loop through respondants and add to set
+    i.respondents.map((i) => allRespondentsSet.add(`${i.username}`));
+  });
 
   return {
     content: is_multi_choice
@@ -57,39 +90,15 @@ const renderPoll = (pollData) => {
       : "Select one answer:",
     embeds: [
       // question
-      renderPromptEmbed(pollData),
+      renderPromptEmbed(pollData, responses_hidden),
       // responses
-      renderResponseEmbed(pollData),
+      renderResponseEmbed(pollData, allRespondentsSet, !responses_hidden),
     ],
-    // choices
     components: [
-      {
-        type: 1,
-        components: choices.map((i, index) => {
-          return {
-            type: 2,
-            style: 2,
-            emoji: { name: emojiMap[index + 1] },
-            custom_id: `poll/${poll_id}/vote/${i.n}/${pollCreator.id}`,
-          };
-        }),
-      },
+      // choices
+      renderChoices(pollData),
       // show an end poll button if responses are set to hidden
-      ...(responses_hidden
-        ? [
-            {
-              type: 1,
-              components: [
-                {
-                  type: 2,
-                  label: "Reveal",
-                  style: 3,
-                  custom_id: `poll/${poll_id}/reveal`,
-                },
-              ],
-            },
-          ]
-        : []),
+      ...renderPollActions(pollData, allRespondentsSet),
     ],
   };
 };
