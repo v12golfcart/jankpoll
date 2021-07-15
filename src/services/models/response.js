@@ -1,5 +1,6 @@
 const { pool } = require("../database");
 const { dbLookup, dbAddRecord, isoToPsql } = require("../../utils");
+const { response } = require("express");
 
 const model = {
   response_id: "bigint primary key",
@@ -53,11 +54,12 @@ const fetchResponsesByPollId = async (poll_id) => {
 
 // get responses for a given user for a poll
 const fetchUserPollResponsesByUserId = async (poll_id, user_id) => {
-  const client = await pool.connect();
-  const queryText = `SELECT * FROM responses WHERE poll_id = ${poll_id} and discord_responder_id = ${user_id}`;
-  const res = await client.query(queryText);
-  const responsesData = res.rows;
-  console.log("responsesdata", responsesData);
+  const responses = await fetchResponsesByPollId(poll_id);
+  let userResponses = [];
+  if (responses && responses.length > 0) {
+    userResponses = responses.filter((i) => i.discord_responder_id === user_id);
+  }
+  return userResponses;
 };
 
 // create response
@@ -141,4 +143,5 @@ module.exports = {
   createResponseTable,
   createResponse,
   fetchResponsesByPollId,
+  fetchUserPollResponsesByUserId,
 };
