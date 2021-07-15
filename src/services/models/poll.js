@@ -1,5 +1,10 @@
 const { pool } = require("../database");
-const { dbLookup, dbAddRecord, isoToPsql } = require("../../utils");
+const {
+  dbLookup,
+  dbAddRecord,
+  dbUpdateRecord,
+  isoToPsql,
+} = require("../../utils");
 
 const model = {
   poll_id: "bigint primary key",
@@ -172,10 +177,29 @@ const getFullPollStateByPollId = async (poll_id) => {
   }
 };
 
+// update poll
+// this sucks... i should just have poll data on polls table and do joins
+const revealPollResults = async (poll_id) => {
+  const client = await pool.connect();
+  try {
+    const queryText = `
+    UPDATE polls SET poll_responses_hidden = false WHERE poll_id = ${poll_id};
+    UPDATE choices SET poll_responses_hidden = false WHERE poll_id = ${poll_id};
+    UPDATE responses SET poll_responses_hidden = false WHERE poll_id = ${poll_id};
+    `;
+    await client.query(queryText);
+  } catch (e) {
+    console.error("Error revealing polls query: ", e.message);
+  } finally {
+    client.release();
+  }
+};
+
 module.exports = {
   model,
   createPollTable,
   lookupPollById,
   createPoll,
   getFullPollStateByPollId,
+  revealPollResults,
 };

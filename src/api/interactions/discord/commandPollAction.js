@@ -5,14 +5,16 @@ const pollAction = (req, res) => {
   const { id, member } = req.body;
   const user = member.user;
   const custom_id = req.body.data.custom_id;
-  const custom_id_regex = custom_id.match("poll/(\\d+)/(\\w+)/(\\d+)/");
+  const custom_id_regex = custom_id.match("poll/(\\d+)/(\\w+)");
   const poll_id = custom_id_regex[1];
   const action = custom_id_regex[2];
-  const choice_n = parseInt(custom_id_regex[3]);
   console.log(custom_id_regex);
   // const pollCommandId = custom_id_regex[2];
 
   const voteOnPoll = async () => {
+    const customPollRegex = custom_id.match("poll/(\\d+)/(\\w+)/(\\d+)/");
+    const choice_n = parseInt(customPollRegex[3]);
+
     try {
       // handle poll voting
       await responseModel.votePoll(id, poll_id, choice_n, user);
@@ -21,8 +23,7 @@ const pollAction = (req, res) => {
       const poll = await pollModel.getFullPollStateByPollId(poll_id);
       console.log("poll", poll);
 
-      // reply with an ephemeral message about captured responses
-      // i dunno how to do this
+      // TODO reply with an ephemeral message about captured responses
 
       // update the poll
       res.send({
@@ -41,7 +42,24 @@ const pollAction = (req, res) => {
     }
   };
 
-  const closePoll = () => {
+  const revealPollResults = async () => {
+    try {
+      // update poll to reveal answers
+      await pollModel.revealPollResults(poll_id);
+
+      // rebuild full poll
+      const poll = await pollModel.getFullPollStateByPollId(poll_id);
+      console.log("poll", poll);
+    } catch (e) {
+      console.error("Error handling user response: ", e.message);
+      res.send({
+        type: 4,
+        data: {
+          content: "Something went wrong -- try again.",
+          flags: 64,
+        },
+      });
+    }
     res.send({
       type: 7,
       data: {
@@ -54,8 +72,8 @@ const pollAction = (req, res) => {
     case "vote":
       voteOnPoll();
       break;
-    case "close":
-      closePoll();
+    case "reveal":
+      revealPollResults();
       break;
     default:
       res.send("Unknown command");

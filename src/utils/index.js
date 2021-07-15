@@ -130,6 +130,49 @@ const dbAddRecord = async (pool, table, model, payloadArr, reqFieldsArray) => {
   }
 };
 
+// const dbUpdateRecord = async (
+//   pool,
+//   table,
+//   model,
+//   colsArr,
+//   valuesArr,
+//   filterKey,
+//   filterValue
+// ) => {
+//   const client = await pool.connect();
+//   try {
+//     // validate that cols are in the model
+//     const badCols = colsArr.filter((i) => !Object.keys(model).includes(i));
+//     if (badCols.length > 0)
+//       throw new Error(
+//         `Update includes columns (${badCols.join(
+//           ", "
+//         )}) not in the data model for ${table}`
+//       );
+
+//     // build query
+//     const query = format(
+//       `UPDATE ${table} SET (${colsArr.join(
+//         ", "
+//       )}) = (%L) WHERE ${filterKey} = %L returning *`,
+//       valuesArr,
+//       filterValue
+//     );
+
+//     // send request
+//     const res = await client.query(query);
+//     console.log(
+//       `Updated ${table} where ${filterKey} = ${filterValue}`,
+//       res.rows
+//     );
+//     return res.rows;
+//   } catch (e) {
+//     console.error(`Error updating a record in ${table}: `, e.message);
+//   } finally {
+//     client.release();
+//   }
+// };
+
 /* ++++++++++++++++++++++++
 Export
 ++++++++++++++++++++++++ */
@@ -144,6 +187,7 @@ module.exports = {
   //db/models
   dbLookup,
   dbAddRecord,
+  // dbUpdateRecord,
   // discord commands
   discordMessageRendering: require("./discordMessageRendering"),
 };

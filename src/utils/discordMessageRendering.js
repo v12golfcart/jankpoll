@@ -82,9 +82,9 @@ const renderPoll = (pollData) => {
               components: [
                 {
                   type: 2,
-                  label: "Close poll",
-                  style: 4,
-                  custom_id: `poll/${poll_id}/close`,
+                  label: "Reveal",
+                  style: 3,
+                  custom_id: `poll/${poll_id}/reveal`,
                 },
               ],
             },
