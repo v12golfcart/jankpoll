@@ -11,6 +11,12 @@ const model = {
   community_id: "bigint",
   poll_id: "bigint",
   poll_type: "int",
+  poll_message_id: "bigint",
+  poll_prompt_value: "varchar",
+  poll_prompt_img_url: "varchar",
+  poll_is_multi_choice: "boolean",
+  poll_is_anonymous: "boolean",
+  poll_responses_hidden: "boolean",
   poll_quiz_leaderboard_id: "bigint",
   discord_responder_id: "bigint",
   discord_username: "varchar",
@@ -45,6 +51,15 @@ const fetchResponsesByPollId = async (poll_id) => {
   return await dbLookup(pool, "responses", model, "poll_id", poll_id, false);
 };
 
+// get responses for a given user for a poll
+const fetchUserPollResponsesByUserId = async (poll_id, user_id) => {
+  const client = await pool.connect();
+  const queryText = `SELECT * FROM responses WHERE poll_id = ${poll_id} and discord_responder_id = ${user_id}`;
+  const res = await client.query(queryText);
+  const responsesData = res.rows;
+  console.log("responsesdata", responsesData);
+};
+
 // create response
 const createResponse = async ([
   {
@@ -56,6 +71,11 @@ const createResponse = async ([
     community_id,
     poll_id,
     poll_type,
+    poll_prompt_value,
+    poll_prompt_img_url,
+    poll_is_multi_choice,
+    poll_is_anonymous,
+    poll_responses_hidden,
     poll_quiz_leaderboard_id,
     discord_responder_id,
     discord_username,
@@ -82,6 +102,11 @@ const createResponse = async ([
         community_id,
         poll_id,
         poll_type,
+        poll_prompt_value,
+        poll_prompt_img_url,
+        poll_is_multi_choice,
+        poll_is_anonymous,
+        poll_responses_hidden,
         poll_quiz_leaderboard_id,
         discord_responder_id,
         discord_username,

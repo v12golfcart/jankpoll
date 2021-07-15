@@ -122,15 +122,6 @@ const dbAddRecord = async (pool, table, model, payloadArr, reqFieldsArray) => {
       `INSERT INTO ${table} (${cols}) VALUES %L returning *`,
       values
     );
-    // const queryText = `INSERT INTO ${table} (${Object.keys(
-    //   payloadObjCleaned
-    // ).join(", ")}) VALUES (${Object.keys(payloadObjCleaned)
-    //   .map((i) =>
-    //     ["varchar", "timestamp"].includes(model[i])
-    //       ? `'${payloadObjCleaned[i]}'`
-    //       : `${payloadObjCleaned[i]}`
-    //   )
-    //   .join(", ")}) returning *`;
 
     // send request
     const res = await client.query(query);
