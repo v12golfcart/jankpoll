@@ -1,6 +1,7 @@
 const { pool } = require("../database");
 const { dbLookup, dbAddRecord, isoToPsql } = require("../../utils");
 const choiceModel = require("./choice");
+const format = require("pg-format");
 
 const model = {
   response_id: "bigint primary key",
@@ -159,6 +160,40 @@ const deleteResponse = async (poll_id, choice_n, user_id) => {
   }
 };
 
+// replace response
+const replaceResponse = async (responseObj) => {
+  const created_ts = isoToPsql(new Date().toISOString());
+  const client = await pool.connect();
+  const { poll_id, discord_responder_id } = responseObj;
+  const responseObjWithTs = {
+    ...responseObj,
+    created_ts,
+  };
+  try {
+    // build query
+    const cols = Object.keys(responseObjWithTs).join(", ");
+    const values = [Object.values(responseObjWithTs)];
+    const query = format(
+      `
+    DELETE FROM responses 
+    WHERE 1=1
+      AND poll_id = ${poll_id}
+      AND discord_responder_id = ${discord_responder_id}
+    ;
+
+    INSERT INTO responses (${cols}) VALUES %L returning *
+    `,
+      values
+    );
+    const res = await client.query(query);
+    console.log(`Updated a response`, res.rows[0]);
+  } catch (e) {
+    console.error("Error with upserting a response: ", e.message);
+  } finally {
+    client.release();
+  }
+};
+
 // singleChoiceVote
 const votePoll = async (response_id, poll_id, choice_n, user) => {
   // get the choice and response data
@@ -187,20 +222,18 @@ const votePoll = async (response_id, poll_id, choice_n, user) => {
   };
 
   // if a response exists, delete it
-  const existingResponse = await checkForExistingResponse(
-    poll_id,
-    choice_n,
-    user.id
-  );
+  const allResponses = await fetchUserPollResponsesByUserId(poll_id, user.id);
+  const existingResponse =
+    allResponses.length > 0
+      ? allResponses.filter((i) => i.choice_n === choice_n)[0]
+      : false;
   if (existingResponse) {
     await deleteResponse(poll_id, choice_n, user.id);
   } else {
     if (responseObj.poll_is_multi_choice) {
-      console.log("add existing choice");
       await createResponse([responseObj]);
     } else {
-      const created_ts = isoToPsql(new Date().toISOString());
-      console.log(`update existing choice to ${choice_n}`);
+      await replaceResponse(responseObj);
     }
   }
 };

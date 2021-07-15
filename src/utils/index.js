@@ -59,9 +59,6 @@ const dbLookup = async (
 
   // send request
   try {
-    // console.log(
-    //   `Looking for ${mapTableToModel[table]} ${searchValue} (${lookupCol})`
-    // );
     const res = await client.query(queryText);
     if (findOne && res.rowCount > 1) {
       throw new Error(
@@ -71,7 +68,6 @@ const dbLookup = async (
       );
     }
     const record = findOne ? res.rows[0] : res.rows;
-    // console.log(`Results for ${mapTableToModel[table]} lookup:`, record);
     return record;
   } catch (e) {
     console.error(
