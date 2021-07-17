@@ -108,7 +108,7 @@ const renderPoll = (pollData) => {
   const allRespondentsSet = new Set();
   pollData.choices.map((i) => {
     // for each choice, loop through respondants and add to set
-    i.respondents.map((i) => allRespondentsSet.add(`${i.username}`));
+    return i.respondents.map((i) => allRespondentsSet.add(`${i.username}`));
   });
 
   return {
