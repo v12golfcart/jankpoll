@@ -53,7 +53,7 @@ const renderResponseEmbed = (pollData, respondentsSet, isActive = false) => {
     };
   } else {
     return {
-      description: `_Click Reveal to see responses._\n\n${
+      description: `_Click Reveal to see responses._\n${
         respondentsSet.size
       } responses${
         respondentsSet.size > 0 ? `: ${[...respondentsSet].join(", ")}` : ``
