@@ -10,7 +10,7 @@ const {
   PGDATABASE,
   DATABASE_URL,
 } = process.env;
-let root = "https://jankpoll.ngrok.io";
+let root = "http://www.jankpoll.com";
 
 const env = NODE_ENV;
 

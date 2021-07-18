@@ -5,9 +5,6 @@ const pool = new Pool({
   // user: PGUSER,
   // database: PGDATABASE,
   connectionString: DATABASE_URL,
-  // ssl: {
-  //   rejectUnauthorized: false,
-  // },
 });
 
 // error handling for idle clients
