@@ -1,5 +1,5 @@
 const {
-  DEV_ENVIRONMENT,
+  NODE_ENV,
   PORT,
   JWT_SECRET,
   DISCORD_CLIENT_ID,
@@ -8,15 +8,18 @@ const {
   DISCORD_BOT_TOKEN,
   PGUSER,
   PGDATABASE,
+  DATABASE_URL,
 } = process.env;
 let root = "https://jankpoll.ngrok.io";
 
+const env = NODE_ENV;
+
 const environment = {
-  devEnv: DEV_ENVIRONMENT,
+  devEnv: env,
   // domain boiler plate
-  apiURL: DEV_ENVIRONMENT === "production" ? root : `http://localhost:5000`,
-  baseURL: DEV_ENVIRONMENT === "production" ? root : `http://localhost:3000`,
-  port: DEV_ENVIRONMENT === "production" ? PORT : 5000,
+  apiURL: env === "production" ? root : `http://localhost:5000`,
+  baseURL: env === "production" ? root : `http://localhost:3000`,
+  port: env === "production" ? PORT : 5000,
   // JWT
   JWTsecret: JWT_SECRET,
   // google
@@ -28,6 +31,7 @@ const environment = {
   // db
   PGUSER,
   PGDATABASE,
+  DATABASE_URL,
 };
 
 module.exports = environment;

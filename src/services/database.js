@@ -1,9 +1,13 @@
 const { Pool } = require("pg");
-const { PGUSER, PGDATABASE } = require("../config/environment");
+const { DATABASE_URL } = require("../config/environment");
 
 const pool = new Pool({
-  user: PGUSER,
-  database: PGDATABASE,
+  // user: PGUSER,
+  // database: PGDATABASE,
+  connectionString: DATABASE_URL,
+  // ssl: {
+  //   rejectUnauthorized: false,
+  // },
 });
 
 // error handling for idle clients

@@ -121,7 +121,6 @@ const dbAddRecord = async (pool, table, model, payloadArr, reqFieldsArray) => {
 
     // send request
     const res = await client.query(query);
-    console.log(`Added ${mapTableToModel[table]}`, res.rows);
     return res.rows;
   } catch (e) {
     console.error(`Error adding a record to ${table}: `, e.message);

@@ -8,7 +8,6 @@ const pollAction = (req, res) => {
   const custom_id_regex = custom_id.match("poll/(\\d+)/(\\w+)");
   const poll_id = custom_id_regex[1];
   const action = custom_id_regex[2];
-  console.log(custom_id_regex);
   // const pollCommandId = custom_id_regex[2];
 
   const voteOnPoll = async () => {

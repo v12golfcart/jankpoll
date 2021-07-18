@@ -150,9 +150,6 @@ const deleteResponse = async (poll_id, choice_n, user_id) => {
   try {
     const queryText = `DELETE FROM responses WHERE poll_id = ${poll_id} and choice_n = ${choice_n} and discord_responder_id = ${user_id};`;
     await client.query(queryText);
-    console.log(
-      `Deleted response ${choice_n} from user ${user_id} from ${poll_id}`
-    );
   } catch (e) {
     console.error("Error with deleting a response: ", e.message);
   } finally {
@@ -186,7 +183,6 @@ const replaceResponse = async (responseObj) => {
       values
     );
     const res = await client.query(query);
-    console.log(`Updated a response`, res.rows[0]);
   } catch (e) {
     console.error("Error with upserting a response: ", e.message);
   } finally {
