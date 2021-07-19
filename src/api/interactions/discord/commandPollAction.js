@@ -2,6 +2,7 @@ const { pollModel, responseModel } = require("../../../services/models");
 const { discordMessageRendering } = require("../../../utils");
 
 const pollAction = (req, res) => {
+  const initialMessage = req.body.message;
   const { id, member } = req.body;
   const user = member.user;
   const custom_id = req.body.data.custom_id;
@@ -27,7 +28,7 @@ const pollAction = (req, res) => {
       // update the poll
       res.send({
         type: 7,
-        data: discordMessageRendering.renderPoll(poll),
+        data: discordMessageRendering.renderPoll(poll, initialMessage),
       });
     } catch (e) {
       console.error("Error handling user response: ", e.message);
@@ -53,7 +54,32 @@ const pollAction = (req, res) => {
       // update the poll
       res.send({
         type: 7,
-        data: discordMessageRendering.renderPoll(poll),
+        data: discordMessageRendering.renderPoll(poll, initialMessage),
+      });
+    } catch (e) {
+      console.error("Error handling user response: ", e.message);
+      res.send({
+        type: 4,
+        data: {
+          content: "Something went wrong -- try again.",
+          flags: 64,
+        },
+      });
+    }
+  };
+
+  const toggleRespondents = async () => {
+    try {
+      // rebuild full poll
+      const poll = await pollModel.getFullPollStateByPollId(poll_id);
+      console.log("poll", poll);
+
+      // regenerate poll with respondents toggled
+      res.send({
+        type: 7,
+        data: discordMessageRendering.renderPoll(poll, initialMessage, {
+          toggleShowRespondents: true,
+        }),
       });
     } catch (e) {
       console.error("Error handling user response: ", e.message);
@@ -73,6 +99,12 @@ const pollAction = (req, res) => {
       break;
     case "reveal":
       revealPollResults();
+      break;
+    case "respondents_show":
+      toggleRespondents();
+      break;
+    case "respondents_hide":
+      toggleRespondents();
       break;
     default:
       res.send("Unknown command");

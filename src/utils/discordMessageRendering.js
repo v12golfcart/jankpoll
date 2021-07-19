@@ -78,8 +78,38 @@ const renderChoices = (pollData) => {
   };
 };
 
-const renderPollActions = (pollData, allRespondentsSet) => {
+const renderPollActions = (
+  pollData,
+  allRespondentsSet,
+  showRespondents = false
+) => {
   const { poll_id, responses_hidden } = pollData;
+  const respondentsButton = () => {
+    return showRespondents
+      ? {
+          type: 1,
+          components: [
+            {
+              type: 2,
+              label: "Hide respondents",
+              style: 2,
+              custom_id: `poll/${poll_id}/respondents_hide`,
+            },
+          ],
+        }
+      : {
+          type: 1,
+          components: [
+            {
+              type: 2,
+              label: "Show respondents",
+              style: 2,
+              custom_id: `poll/${poll_id}/respondents_show`,
+            },
+          ],
+        };
+  };
+
   return responses_hidden
     ? [
         {
@@ -94,15 +124,31 @@ const renderPollActions = (pollData, allRespondentsSet) => {
           ],
         },
       ]
-    : [];
+    : [respondentsButton()];
 };
 
-const renderPoll = (pollData) => {
+const renderPoll = (pollData, initialMessage, stateConfig) => {
   const {
     is_multi_choice,
     responses_hidden,
     // is_anonymous,
   } = pollData;
+
+  const showingRespondents = () => {
+    if (!responses_hidden && initialMessage) {
+      const buttonState = initialMessage.components[1].components[0].custom_id;
+      const currentRespondentsState = buttonState.match("respondents_hide")
+        ? true
+        : false;
+
+      // if toggle flip value, else keep value
+      if (stateConfig && stateConfig.toggleShowRespondents)
+        return !currentRespondentsState;
+      else return currentRespondentsState;
+    } else {
+      return false;
+    }
+  };
 
   // make a responses set
   const allRespondentsSet = new Set();
@@ -125,7 +171,7 @@ const renderPoll = (pollData) => {
       // choices
       renderChoices(pollData),
       // show an end poll button if responses are set to hidden
-      ...renderPollActions(pollData, allRespondentsSet),
+      ...renderPollActions(pollData, allRespondentsSet, showingRespondents()),
     ],
   };
 };
