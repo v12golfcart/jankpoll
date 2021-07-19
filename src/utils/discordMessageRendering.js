@@ -39,11 +39,7 @@ const renderResponseEmbed = (
 
   const renderRespondents = (respondents) => {
     if (respondents.length === 0) return "\n";
-    return (
-      "\n" +
-      respondents.map((i) => `${i.username}#${i.discriminator}`).join(", ") +
-      "\n"
-    );
+    return "\n" + respondents.map((i) => `${i.username}`).join(", ") + "\n";
   };
 
   const renderGraph = (pollData, totalResponses) => {
@@ -202,31 +198,31 @@ const renderPoll = (pollData, initialMessage, stateConfig) => {
 };
 
 const renderLeaderboardLists = (leaderboardsInfo) => {
-  const { community_id } = leaderboardsInfo;
-  const leaderboards = [
-    {
-      leaderboard_id: 123,
-      leaderboard_name: "testing 1",
-      standings: [
-        {
-          id: 123,
-          username: "xtopher",
-          discriminator: "1234",
-          avatar: "",
-          score: 123,
-          rank: 1,
-        },
-        {
-          id: 123,
-          username: "whiskeybravo",
-          discriminator: "1234",
-          avatar: "",
-          score: 10,
-          rank: 2,
-        },
-      ],
-    },
-  ];
+  // const { community_id } = leaderboardsInfo;
+  // const leaderboards = [
+  //   {
+  //     leaderboard_id: 123,
+  //     leaderboard_name: "testing 1",
+  //     standings: [
+  //       {
+  //         id: 123,
+  //         username: "xtopher",
+  //         discriminator: "1234",
+  //         avatar: "",
+  //         score: 123,
+  //         rank: 1,
+  //       },
+  //       {
+  //         id: 123,
+  //         username: "whiskeybravo",
+  //         discriminator: "1234",
+  //         avatar: "",
+  //         score: 10,
+  //         rank: 2,
+  //       },
+  //     ],
+  //   },
+  // ];
 
   return {
     content: "These are your leaderboards:",
