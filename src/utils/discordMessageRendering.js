@@ -154,7 +154,7 @@ const renderPoll = (pollData, initialMessage, stateConfig) => {
 
   // are respondents being shown?
   const showingRespondents = () => {
-    if (!responses_hidden && initialMessage) {
+    if (!responses_hidden && initialMessage && initialMessage.components[1]) {
       const buttonState = initialMessage.components[1].components[0].custom_id;
       const currentRespondentsState = buttonState.match("respondents_hide")
         ? true
