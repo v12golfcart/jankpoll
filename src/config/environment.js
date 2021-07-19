@@ -12,7 +12,7 @@ const {
 } = process.env;
 let root = "http://www.jankpoll.com";
 
-const env = NODE_ENV;
+const env = NODE_ENV || "development";
 
 const environment = {
   devEnv: env,

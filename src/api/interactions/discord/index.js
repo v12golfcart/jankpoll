@@ -32,6 +32,9 @@ router.post("/", (req, res) => {
     case "create-poll":
       require("./commandCreatePoll")(req, res);
       break;
+    case "create-leaderboard":
+      require("./commandCreateLeaderboard")(req, res);
+      break;
     case "poll-action":
       require("./commandPollAction")(req, res);
       break;

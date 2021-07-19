@@ -130,6 +130,89 @@ const renderPoll = (pollData) => {
   };
 };
 
+const renderLeaderboardLists = (leaderboardsInfo) => {
+  const { community_id } = leaderboardsInfo;
+  const leaderboards = [
+    {
+      leaderboard_id: 123,
+      leaderboard_name: "testing 1",
+      standings: [
+        {
+          id: 123,
+          username: "xtopher",
+          discriminator: "1234",
+          avatar: "",
+          score: 123,
+          rank: 1,
+        },
+        {
+          id: 123,
+          username: "whiskeybravo",
+          discriminator: "1234",
+          avatar: "",
+          score: 10,
+          rank: 2,
+        },
+      ],
+    },
+  ];
+
+  return {
+    content: "These are your leaderboards:",
+  };
+};
+
+const renderLeaderboard = (temp, customContent) => {
+  const leaderboard = {
+    leaderboard_id: 123,
+    community_id: 123,
+    leaderboard_name: "testing 1",
+    standings: [
+      {
+        id: 123,
+        username: "xtopher",
+        discriminator: "1234",
+        avatar: "",
+        score: 123,
+        rank: 1,
+      },
+      {
+        id: 123,
+        username: "whiskeybravo",
+        discriminator: "1234",
+        avatar: "",
+        score: 10,
+        rank: 2,
+      },
+    ],
+  };
+
+  const renderStandings = (standings) => {
+    if (standings.length === 0)
+      return "Nobody has any points yet. Create some quizzes for your members!";
+
+    return standings
+      .map(
+        (i, index) =>
+          `${index}. ${i.username}#${i.discriminator}: ${i.score} points`
+      )
+      .join("\n\n");
+  };
+
+  return {
+    content: customContent || "These are your leaderboards:",
+    embeds: [
+      {
+        title: leaderboard.leaderboard_name,
+        description: renderStandings(leaderboard.standings),
+        color: "41667",
+      },
+    ],
+  };
+};
+
 module.exports = {
   renderPoll,
+  renderLeaderboardLists,
+  renderLeaderboard,
 };
