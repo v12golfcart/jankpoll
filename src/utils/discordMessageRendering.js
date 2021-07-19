@@ -162,31 +162,7 @@ const renderLeaderboardLists = (leaderboardsInfo) => {
   };
 };
 
-const renderLeaderboard = (temp, customContent) => {
-  const leaderboard = {
-    leaderboard_id: 123,
-    community_id: 123,
-    leaderboard_name: "testing 1",
-    standings: [
-      {
-        id: 123,
-        username: "xtopher",
-        discriminator: "1234",
-        avatar: "",
-        score: 123,
-        rank: 1,
-      },
-      {
-        id: 123,
-        username: "whiskeybravo",
-        discriminator: "1234",
-        avatar: "",
-        score: 10,
-        rank: 2,
-      },
-    ],
-  };
-
+const renderLeaderboard = (leaderboard, customContent) => {
   const renderStandings = (standings) => {
     if (standings.length === 0)
       return "Nobody has any points yet. Create some quizzes for your members!";
@@ -194,7 +170,7 @@ const renderLeaderboard = (temp, customContent) => {
     return standings
       .map(
         (i, index) =>
-          `${index}. ${i.username}#${i.discriminator}: ${i.score} points`
+          `${index + 1}. ${i.username}#${i.discriminator}: ${i.score} points`
       )
       .join("\n\n");
   };
