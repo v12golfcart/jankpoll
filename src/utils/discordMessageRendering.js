@@ -21,7 +21,12 @@ const renderPromptEmbed = (pollData, isActive = true) => {
   };
 };
 
-const renderResponseEmbed = (pollData, respondentsSet, isActive = false) => {
+const renderResponseEmbed = (
+  pollData,
+  respondentsSet,
+  isActive = false,
+  respondentsAreShown = false
+) => {
   const totalResponses = pollData.choices.reduce((acc, i) => {
     return acc + i.respondents.length;
   }, 0);
@@ -32,6 +37,15 @@ const renderResponseEmbed = (pollData, respondentsSet, isActive = false) => {
     )} (${numResponses})`;
   };
 
+  const renderRespondents = (respondents) => {
+    if (respondents.length === 0) return "\n";
+    return (
+      "\n" +
+      respondents.map((i) => `${i.username}#${i.discriminator}`).join(", ") +
+      "\n"
+    );
+  };
+
   const renderGraph = (pollData, totalResponses) => {
     const choices = pollData.choices;
 
@@ -40,7 +54,11 @@ const renderResponseEmbed = (pollData, respondentsSet, isActive = false) => {
         const n = i.n;
         const numResponses = i.respondents.length;
         const size = (numResponses / totalResponses).toFixed(1) * 10;
-        return renderBar(n, size, numResponses);
+        const bar = renderBar(n, size, numResponses);
+        const respondents = respondentsAreShown
+          ? renderRespondents(i.respondents)
+          : "";
+        return bar + respondents;
       })
       .join("\n");
   };
@@ -134,6 +152,7 @@ const renderPoll = (pollData, initialMessage, stateConfig) => {
     // is_anonymous,
   } = pollData;
 
+  // are respondents being shown?
   const showingRespondents = () => {
     if (!responses_hidden && initialMessage) {
       const buttonState = initialMessage.components[1].components[0].custom_id;
@@ -149,11 +168,12 @@ const renderPoll = (pollData, initialMessage, stateConfig) => {
       return false;
     }
   };
+  const respondentsAreShown = showingRespondents();
 
   // make a responses set
   const allRespondentsSet = new Set();
   pollData.choices.map((i) => {
-    // for each choice, loop through respondants and add to set
+    // for each choice, loop through respondents and add to set
     return i.respondents.map((i) => allRespondentsSet.add(`${i.username}`));
   });
 
@@ -165,13 +185,18 @@ const renderPoll = (pollData, initialMessage, stateConfig) => {
       // question
       renderPromptEmbed(pollData, responses_hidden),
       // responses
-      renderResponseEmbed(pollData, allRespondentsSet, !responses_hidden),
+      renderResponseEmbed(
+        pollData,
+        allRespondentsSet,
+        !responses_hidden,
+        respondentsAreShown
+      ),
     ],
     components: [
       // choices
       renderChoices(pollData),
       // show an end poll button if responses are set to hidden
-      ...renderPollActions(pollData, allRespondentsSet, showingRespondents()),
+      ...renderPollActions(pollData, allRespondentsSet, respondentsAreShown),
     ],
   };
 };
